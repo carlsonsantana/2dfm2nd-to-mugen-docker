@@ -1,0 +1,16 @@
+# Build artifacts and outputs
+**/bin/
+**/obj/
+**/publish/
+Publish/
+
+# VCS / IDE
+.git/
+.gitignore
+.vs/
+.vscode/
+.idea/
+
+# Docker
+Dockerfile
+.dockerignore
