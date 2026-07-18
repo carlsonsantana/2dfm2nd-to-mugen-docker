@@ -162,3 +162,41 @@ the current working directory (see `fm2ndparser/docs/cli-usage.md`).
 - The **Python code structure and dependencies are not yet designed** — decide
   them when that code is written; keep the "MUGEN tools for binary, Python for
   text" split.
+
+## Code style
+
+- Functions: 4-20 lines. Split if longer.
+- Files: under 500 lines. Split by responsibility.
+- One thing per function, one responsibility per module (SRP).
+- Names: specific and unique. Avoid `data`, `handler`, `Manager`.
+  Prefer names that return <5 grep hits in the codebase.
+- Types: explicit. No `any`, no `Dict`, no untyped functions.
+- No code duplication. Extract shared logic into a function/module.
+- Early returns over nested ifs. Max 2 levels of indentation.
+- Exception messages must include the offending value and expected shape.
+
+## Comments
+
+- Keep your own comments. Don't strip them on refactor — they carry
+  intent and provenance.
+- Write WHY, not WHAT. Skip `// increment counter` above `i += 1`.
+- Docstrings on public functions: intent + one usage example.
+- Reference issue numbers / commit SHAs when a line exists because
+  of a specific bug or upstream constraint.
+
+## Dependencies
+
+- Inject dependencies through constructor/parameter, not global/import.
+- Wrap third-party libs behind a thin interface owned by this project.
+- Use requirements.txt to list all dependencies.
+- Use `virtualenv` to install dependencies locally, but don't use it in the container.
+
+## Structure
+
+- Follow the python convention.
+- Prefer small focused modules over god files.
+- Predictable paths: controller/model/view, src/lib/test, etc.
+
+## Formatting
+
+- Use the language default formatter (`black`). Don't discuss style beyond that.

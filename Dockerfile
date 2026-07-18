@@ -35,10 +35,25 @@ ENV HOME=/root \
 RUN mkdir -p "$XDG_RUNTIME_DIR" && chmod 700 "$XDG_RUNTIME_DIR" \
     && wineboot --init && wineserver -w
 
-# Application binaries live here...
+# Python drives the text/image half of the pipeline. Only the interpreter + pip
+# come from apk; the actual dependencies (Pillow for BMP->PNG, pytest for the
+# round-trip test) are installed with pip from the pinned requirements.txt. Pillow
+# ships musllinux wheels on PyPI, so no build toolchain is needed. Alpine marks its
+# Python as externally managed (PEP 668); --break-system-packages installs into the
+# system interpreter, which is what we want in a container (no virtualenv here).
+RUN apk add --no-cache python3 py3-pip
+COPY requirements.txt /opt/converter/requirements.txt
+RUN pip install --no-cache-dir --break-system-packages \
+        -r /opt/converter/requirements.txt
+
+# .NET parser binaries...
 COPY --from=build /app /opt/fm2ndparser
 
-# ...and /data is where you mount the FM2nd game files to parse.
+# ...and the Python converter package (importable as `fm2nd2mugen`).
+COPY src /opt/converter
+ENV PYTHONPATH=/opt/converter
+
+# /data is where FM2nd files are parsed relative to.
 WORKDIR /data
 
 ENTRYPOINT ["dotnet", "/opt/fm2ndparser/Fm2ndParser.dll"]
