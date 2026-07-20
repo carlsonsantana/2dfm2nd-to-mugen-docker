@@ -1,13 +1,15 @@
-# MUGEN sprite tools: `sprmake2` and `sff2png`
+# MUGEN tool: `sprmake2`
 
-Reference for the two official MUGEN 1.0 sprite tools this project drives (under
-Wine) to build and verify SFF files. Source of truth: the tools' own `--help`
-output and `mugen/docs/sprmake2.html` (SpriteMaker ver 2.00beta, Elecbyte 2009).
+Reference for `sprmake2`, the official MUGEN 1.0 tool this project drives (under
+Wine) to **build an SFF** from PNG source images. Source of truth: the tool's own
+`--help` output and `mugen/docs/sprmake2.html` (SpriteMaker ver 2.00beta, Elecbyte
+2009). Its reverse — extracting PNGs from an SFF for the round-trip test — is
+[`sff2png`](sff2png-usage.md).
 
-Both executables are **32-bit x86 Windows binaries** (they ship with
-`Microsoft.VC90.CRT` / `Elecbyte.MUGEN.libs`, `processorArchitecture="x86"`), so
-Wine must be able to run 32-bit PE code. They are mounted at runtime under
-`/mugen` and never redistributed in the image.
+`sprmake2.exe` is a **32-bit x86 Windows binary** (ships with `Microsoft.VC90.CRT`
+/ `Elecbyte.MUGEN.libs`, `processorArchitecture="x86"`), so Wine must be able to
+run 32-bit PE code. It is mounted at runtime under `/mugen` and never
+redistributed in the image.
 
 ## SFF background
 
@@ -125,30 +127,7 @@ Per `CLAUDE.md` conventions, for the SFF-building task:
   palette, so no special-casing is needed.
 - `sprite.compress.8 = none` (or `rle8`; both are lossless for pixels).
 
-## `sff2png` — extract PNGs from an SFF (used by the test)
+## Verifying the result
 
-`sff2png` (v0.2, 2010-07-12) reads an SFF (including SFF v2) and writes each sprite
-back out as a PNG. Used by the round-trip test to compare rebuilt images against
-the source images.
-
-### CLI
-
-```
-Usage: sff2png [options] <infilename[.sff]> <outfilestr>
-Options:
- -h -?  Prints this help message
- -f[n]  Forces all files to have the palette of the nth frame (n defaults to 0)
-
-Warning: SFF2PNG will overwrite files without confirmation.
-```
-
-### Outputs
-
-- PNG files named `<outfilestr><NNN>.png`, where `<NNN>` is a **zero-padded
-  3-digit sequential index** in SFF sprite order (`%s%0003i.png`).
-- A companion **`<outfilestr>-sff.def`** listing the sprites as
-  `grp,idx, fname, startcol,endcol`. The test parses this to map each output PNG
-  back to its `(group, image)` and align it with the corresponding source image.
-
-Because output files are numbered sequentially (not by group/image), always use
-the emitted `-sff.def` mapping rather than assuming positional order.
+The reverse tool [`sff2png`](sff2png-usage.md) explodes an SFF back into PNGs; the
+round-trip test uses it to confirm `sprmake2` preserved every sprite's pixels.
