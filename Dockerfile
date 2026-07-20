@@ -56,5 +56,5 @@ ENV PYTHONPATH=/opt/converter
 # /data is where FM2nd files are parsed relative to.
 WORKDIR /data
 
-ENTRYPOINT ["dotnet", "/opt/fm2ndparser/Fm2ndParser.dll"]
-CMD ["--help"]
+# Convert every .player in /input into /output/<name>/<name>.sff.
+CMD ["python3", "-m", "fm2nd2mugen.main"]

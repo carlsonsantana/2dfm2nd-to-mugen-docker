@@ -8,23 +8,9 @@ from PIL import Image
 from fm2nd2mugen.bmp_to_png import convert_image_folder, convert_indexed_bmp_to_png
 
 
-def _write_indexed_bmp(path: Path, size: tuple[int, int]) -> Image.Image:
-    """Create a small 8-bit indexed BMP with a known palette + pixel indices."""
-    width, height = size
-    image = Image.new("P", size)
-    # A distinctive, non-greyscale palette so a mangled table is obvious.
-    palette = []
-    for i in range(256):
-        palette.extend([i, (255 - i), (i * 2) % 256])
-    image.putpalette(palette)
-    image.putdata([(x + y) % 256 for y in range(height) for x in range(width)])
-    image.save(path, format="BMP")
-    return image
-
-
-def test_conversion_preserves_size_indices_and_palette(tmp_path: Path) -> None:
+def test_conversion_preserves_size_indices_and_palette(tmp_path, make_indexed_bmp) -> None:
     bmp = tmp_path / "0000.bmp"
-    source = _write_indexed_bmp(bmp, (7, 5))
+    source = make_indexed_bmp(bmp, (7, 5))
 
     png = tmp_path / "0000.png"
     convert_indexed_bmp_to_png(bmp, png)
@@ -44,11 +30,11 @@ def test_rejects_non_indexed_image(tmp_path: Path) -> None:
         convert_indexed_bmp_to_png(rgb, tmp_path / "out.png")
 
 
-def test_convert_image_folder_maps_every_bmp(tmp_path: Path) -> None:
+def test_convert_image_folder_maps_every_bmp(tmp_path, make_indexed_bmp) -> None:
     bmp_dir = tmp_path / "img"
     bmp_dir.mkdir()
     for name in ("0000.bmp", "0001.bmp", "0002.bmp"):
-        _write_indexed_bmp(bmp_dir / name, (3, 3))
+        make_indexed_bmp(bmp_dir / name, (3, 3))
 
     pngs = convert_image_folder(bmp_dir, tmp_path / "png")
 
