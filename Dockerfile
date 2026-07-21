@@ -14,7 +14,7 @@ RUN dotnet publish Fm2ndParser/Fm2ndParser.csproj \
         --no-restore
 
 # ---- Runtime stage: slim .NET 10 runtime on Alpine ----
-FROM mcr.microsoft.com/dotnet/runtime:10.0-alpine AS runtime
+FROM mcr.microsoft.com/dotnet/runtime:10.0-alpine AS runtime-base
 
 # Wine runs the official 32-bit x86 MUGEN tools (sprmake2.exe, sff2png.exe)
 # mounted at /mugen. Wine 9+'s new WoW64 mode executes 32-bit PE without needing
@@ -56,5 +56,20 @@ ENV PYTHONPATH=/opt/converter
 # /data is where FM2nd files are parsed relative to.
 WORKDIR /data
 
+# ---- Test image (opt-in): `docker build --target test -t fm2nd2mugen-test .` ----
+# Layers the test suite (unit tests + the round-trip integration test and its
+# fixtures) plus pytest config on top of the runtime, in its own stage so the
+# default production image below never carries them. The absolute tests path lets
+# pytest find pytest.ini/conftest.py regardless of the /data workdir. Run it with
+# the real MUGEN tools mounted (override the command to drop --run-integration and
+# get just the unit tests):
+#   docker run --rm -v /path/to/mugen:/mugen:ro fm2nd2mugen-test
+FROM runtime-base AS test
+COPY pytest.ini /opt/converter/pytest.ini
+COPY tests /opt/converter/tests
+CMD ["python3", "-m", "pytest", "/opt/converter/tests", "--run-integration", "-q"]
+
+# ---- Default production image (built when no --target is given) ----
+FROM runtime-base AS runtime
 # Convert every .player in /input into /output/<name>/<name>.sff.
 CMD ["python3", "-m", "fm2nd2mugen.main"]
