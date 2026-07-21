@@ -14,13 +14,62 @@ RUN dotnet publish Fm2ndParser/Fm2ndParser.csproj \
         --no-restore
 
 # ---- Runtime stage: slim .NET 10 runtime on Alpine ----
-FROM mcr.microsoft.com/dotnet/runtime:10.0-alpine AS runtime
+FROM mcr.microsoft.com/dotnet/runtime:10.0-alpine AS runtime-base
 
-# Application binaries live here...
+# Wine runs the official 32-bit x86 MUGEN tools (sprmake2.exe, sff2png.exe)
+# mounted at /mugen. Wine 9+'s new WoW64 mode executes 32-bit PE without needing
+# 32-bit host libraries, which is what lets it work on musl/Alpine. wine lives in
+# the community repository.
+RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community \
+        wine
+
+# Wine needs a writable HOME + prefix. WINEDEBUG silences its verbose logging.
+# WINEARCH=win64 is a 64-bit prefix; WoW64 still runs the 32-bit tools inside it.
+# XDG_RUNTIME_DIR is set to a private dir so Wine doesn't warn about it.
+ENV HOME=/root \
+    WINEPREFIX=/root/.wine \
+    WINEARCH=win64 \
+    WINEDEBUG=-all \
+    XDG_RUNTIME_DIR=/run/user-wine
+# Initialize the Wine prefix at build time so the first conversion isn't slow.
+RUN mkdir -p "$XDG_RUNTIME_DIR" && chmod 700 "$XDG_RUNTIME_DIR" \
+    && wineboot --init && wineserver -w
+
+# Python drives the text/image half of the pipeline. Only the interpreter + pip
+# come from apk; the actual dependencies (Pillow for BMP->PNG, pytest for the
+# round-trip test) are installed with pip from the pinned requirements.txt. Pillow
+# ships musllinux wheels on PyPI, so no build toolchain is needed. Alpine marks its
+# Python as externally managed (PEP 668); --break-system-packages installs into the
+# system interpreter, which is what we want in a container (no virtualenv here).
+RUN apk add --no-cache python3 py3-pip
+COPY requirements.txt /opt/converter/requirements.txt
+RUN pip install --no-cache-dir --break-system-packages \
+        -r /opt/converter/requirements.txt
+
+# .NET parser binaries...
 COPY --from=build /app /opt/fm2ndparser
 
-# ...and /data is where you mount the FM2nd game files to parse.
+# ...and the Python converter package (importable as `fm2nd2mugen`).
+COPY src /opt/converter
+ENV PYTHONPATH=/opt/converter
+
+# /data is where FM2nd files are parsed relative to.
 WORKDIR /data
 
-ENTRYPOINT ["dotnet", "/opt/fm2ndparser/Fm2ndParser.dll"]
-CMD ["--help"]
+# ---- Test image (opt-in): `docker build --target test -t fm2nd2mugen-test .` ----
+# Layers the test suite (unit tests + the round-trip integration test and its
+# fixtures) plus pytest config on top of the runtime, in its own stage so the
+# default production image below never carries them. The absolute tests path lets
+# pytest find pytest.ini/conftest.py regardless of the /data workdir. Run it with
+# the real MUGEN tools mounted (override the command to drop --run-integration and
+# get just the unit tests):
+#   docker run --rm -v /path/to/mugen:/mugen:ro fm2nd2mugen-test
+FROM runtime-base AS test
+COPY pytest.ini /opt/converter/pytest.ini
+COPY tests /opt/converter/tests
+CMD ["python3", "-m", "pytest", "/opt/converter/tests", "--run-integration", "-q"]
+
+# ---- Default production image (built when no --target is given) ----
+FROM runtime-base AS runtime
+# Convert every .player in /input into /output/<name>/<name>.sff.
+CMD ["python3", "-m", "fm2nd2mugen.main"]

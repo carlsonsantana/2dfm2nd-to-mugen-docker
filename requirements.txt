@@ -1,0 +1,8 @@
+# Generated with `pip freeze` from the local virtualenv (.venv). To refresh:
+#   .venv/bin/pip freeze > requirements.txt
+iniconfig==2.3.0
+packaging==26.2
+pillow==12.3.0
+pluggy==1.6.0
+Pygments==2.20.0
+pytest==9.1.1
