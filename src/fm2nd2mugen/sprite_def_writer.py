@@ -1,6 +1,6 @@
 """Write the sprmake2 SFF definition (`.def`) that assembles the sprite PNGs.
 
-See docs/sprmake2-usage.md for the def format. For this milestone every sprite
+See docs/mugen/sprmake2-usage.md for the def format. For this milestone every sprite
 maps to group 0, image = the FM2nd flat index, axis (0,0); frame offsets belong to
 the `.air` (a later task). autocrop is off and usepal is -1 so pixels and palette
 round-trip faithfully.

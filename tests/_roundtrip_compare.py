@@ -3,7 +3,7 @@
 Round-trip verification helpers for test_sff_roundtrip.py. sff2png writes no
 tRNS chunk and FM2nd uses the top-right-corner color as transparent, so the
 transparent region is ignored; every other pixel must match within the 5-bit
-color step. See docs/sff2png-usage.md and fm2ndparser/docs/output-formats.md.
+color step. See docs/mugen/sff2png-usage.md and fm2ndparser/docs/output-formats.md.
 """
 
 from dataclasses import dataclass
