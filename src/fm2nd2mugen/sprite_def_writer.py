@@ -68,7 +68,9 @@ def render_sprite_def(
         options.append(f"input.dir = {input_dir}")
     options += ["sprite.compress.8 = none", "sprite.autocrop = 0", "sprite.usepal = -1"]
     header = ["[Output]", f"filename = {sff_filename}", "", *options, "", "[Sprite]"]
-    lines = [f"{e.group}, {e.image}, {e.filename}, {e.axis_x}, {e.axis_y}" for e in entries]
+    lines = [
+        f"{e.group}, {e.image}, {e.filename}, {e.axis_x}, {e.axis_y}" for e in entries
+    ]
     return "\n".join(header + lines) + "\n"
 
 

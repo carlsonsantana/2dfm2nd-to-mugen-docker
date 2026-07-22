@@ -11,7 +11,9 @@ from fm2nd2mugen.parser_runner import ExportedResources
 from fm2nd2mugen.wine_runner import WineToolResult
 
 
-def test_convert_player_to_sff_wires_stages(tmp_path, monkeypatch, make_indexed_bmp) -> None:
+def test_convert_player_to_sff_wires_stages(
+    tmp_path, monkeypatch, make_indexed_bmp
+) -> None:
     input_dir = tmp_path / "input"
     input_dir.mkdir()
     player = input_dir / "X.player"
@@ -28,7 +30,11 @@ def test_convert_player_to_sff_wires_stages(tmp_path, monkeypatch, make_indexed_
         # def is <name>-sff.def; sprmake2 would emit <name>.sff beside it
         name = Path(args[0]).stem.removesuffix("-sff")
         assert (cwd / args[0]).is_file()  # def written next to the PNGs
-        assert sorted(p.name for p in cwd.glob("*.png")) == ["0000.png", "0001.png", "0002.png"]
+        assert sorted(p.name for p in cwd.glob("*.png")) == [
+            "0000.png",
+            "0001.png",
+            "0002.png",
+        ]
         (cwd / f"{name}.sff").write_bytes(b"SFFv2-fake")
         return WineToolResult(0, "", "")
 

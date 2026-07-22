@@ -15,7 +15,9 @@ from fm2nd2mugen.sff_pipeline import convert_player_to_sff
 INPUT_DIR = Path(os.environ.get("FM2ND_INPUT_DIR", "/input"))
 OUTPUT_DIR = Path(os.environ.get("FM2ND_OUTPUT_DIR", "/output"))
 WORK_ROOT = Path(os.environ.get("FM2ND_WORK_DIR", "/tmp/fm2nd-build"))
-PARSER_DLL = Path(os.environ.get("FM2ND_PARSER_DLL", "/opt/fm2ndparser/Fm2ndParser.dll"))
+PARSER_DLL = Path(
+    os.environ.get("FM2ND_PARSER_DLL", "/opt/fm2ndparser/Fm2ndParser.dll")
+)
 SPRMAKE2_EXE = Path(os.environ.get("FM2ND_SPRMAKE2", "/mugen/sprmake2.exe"))
 
 

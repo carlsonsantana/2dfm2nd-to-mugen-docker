@@ -8,7 +8,9 @@ from PIL import Image
 from fm2nd2mugen.bmp_to_png import convert_image_folder, convert_indexed_bmp_to_png
 
 
-def test_conversion_preserves_size_indices_and_palette(tmp_path, make_indexed_bmp) -> None:
+def test_conversion_preserves_size_indices_and_palette(
+    tmp_path, make_indexed_bmp
+) -> None:
     bmp = tmp_path / "0000.bmp"
     source = make_indexed_bmp(bmp, (7, 5))
 

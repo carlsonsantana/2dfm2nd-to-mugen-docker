@@ -29,7 +29,9 @@ def test_build_sff_returns_output_when_created(tmp_path: Path) -> None:
     def_file = _write_def(tmp_path)
 
     result = build_sff(
-        def_file, tmp_path / "X.sff", Path("/mugen/sprmake2.exe"),
+        def_file,
+        tmp_path / "X.sff",
+        Path("/mugen/sprmake2.exe"),
         run_tool=_fake_tool_writing(b"SFF\0data"),
     )
 
@@ -44,7 +46,9 @@ def test_build_sff_raises_when_missing(tmp_path: Path) -> None:
         return WineToolResult(1, "", "boom")
 
     with pytest.raises(SprmakeError, match="did not produce"):
-        build_sff(def_file, tmp_path / "X.sff", Path("/mugen/sprmake2.exe"), run_tool=_run)
+        build_sff(
+            def_file, tmp_path / "X.sff", Path("/mugen/sprmake2.exe"), run_tool=_run
+        )
 
 
 def test_build_sff_raises_when_empty(tmp_path: Path) -> None:
@@ -52,6 +56,8 @@ def test_build_sff_raises_when_empty(tmp_path: Path) -> None:
 
     with pytest.raises(SprmakeError, match="did not produce"):
         build_sff(
-            def_file, tmp_path / "X.sff", Path("/mugen/sprmake2.exe"),
+            def_file,
+            tmp_path / "X.sff",
+            Path("/mugen/sprmake2.exe"),
             run_tool=_fake_tool_writing(b""),
         )

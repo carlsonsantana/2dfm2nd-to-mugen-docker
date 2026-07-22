@@ -1,8 +1,12 @@
-# Generated with `pip freeze` from the local virtualenv (.venv). To refresh:
-#   .venv/bin/pip freeze > requirements.txt
+black==26.5.1
+click==8.4.2
 iniconfig==2.3.0
+mypy_extensions==1.1.0
 packaging==26.2
+pathspec==1.1.1
 pillow==12.3.0
+platformdirs==4.10.1
 pluggy==1.6.0
 Pygments==2.20.0
 pytest==9.1.1
+pytokens==0.4.1
