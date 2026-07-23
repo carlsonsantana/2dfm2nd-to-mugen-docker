@@ -1,7 +1,7 @@
-"""Entrypoint: convert every `.player` in the input volume into a MUGEN `.sff`.
+"""Entrypoint: convert every `.player` in the input volume into a MUGEN character.
 
 Paths follow the volume contract (/input, /output, /mugen) and can be overridden
-with environment variables for local runs. This milestone builds only the SFF; the
+with environment variables for local runs. This milestone builds the SFF + AIR; the
 rest of the character folder is assembled by later stages.
 """
 
@@ -9,9 +9,8 @@ import os
 import sys
 from pathlib import Path
 
-from fm2nd2mugen.parser_runner import export_player_resources
+from fm2nd2mugen.character_pipeline import convert_player_to_character
 from fm2nd2mugen.player_discovery import find_player_files
-from fm2nd2mugen.sff_pipeline import build_character_sff
 
 INPUT_DIR = Path(os.environ.get("FM2ND_INPUT_DIR", "/input"))
 OUTPUT_DIR = Path(os.environ.get("FM2ND_OUTPUT_DIR", "/output"))
@@ -34,18 +33,12 @@ def main() -> int:
 
 
 def _convert_one(player_file: Path) -> None:
-    """Convert a single `.player`, reporting the resulting SFF path.
-
-    TODO: fold this parse+build into `character_pipeline.convert_player_to_character`
-    once the AIR stage lands; kept inline here so the entrypoint stays runnable.
-    """
-    print(f"  {player_file.name} -> building SFF ...")
-    name = player_file.stem
-    work_dir = WORK_ROOT / name
-    resources = export_player_resources(player_file, work_dir, PARSER_DLL)
-    result = build_character_sff(resources, name, work_dir, OUTPUT_DIR, SPRMAKE2_EXE)
-    sff = result.sff_path
-    print(f"    wrote {sff} ({sff.stat().st_size} bytes)")
+    """Convert a single `.player`, reporting the resulting SFF + AIR paths."""
+    print(f"  {player_file.name} -> building SFF + AIR ...")
+    artifacts = convert_player_to_character(
+        player_file, WORK_ROOT, OUTPUT_DIR, PARSER_DLL, SPRMAKE2_EXE
+    )
+    print(f"    wrote {artifacts.sff_path} and {artifacts.air_path}")
 
 
 if __name__ == "__main__":
