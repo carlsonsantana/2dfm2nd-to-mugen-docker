@@ -13,7 +13,8 @@ from pathlib import Path
 import pytest
 
 from _roundtrip_compare import assert_png_matches_reference, parse_sprite_def
-from fm2nd2mugen.sff_pipeline import convert_player_to_sff
+from fm2nd2mugen.parser_runner import export_player_resources
+from fm2nd2mugen.sff_pipeline import build_character_sff
 from fm2nd2mugen.wine_runner import run_windows_tool
 
 FIXTURES = Path(__file__).parent / "fixtures" / "roundtrip"
@@ -42,9 +43,12 @@ def test_sff_roundtrip_matches_reference_bmps(tmp_path: Path) -> None:
     sprmake2_exe = _tool_path("FM2ND_SPRMAKE2", "/mugen/sprmake2.exe")
     sff2png_exe = _tool_path("FM2ND_SFF2PNG", "/mugen/sff2png.exe")
 
-    sff = convert_player_to_sff(
-        PLAYER, tmp_path / "work", tmp_path / "out", parser_dll, sprmake2_exe
-    )
+    name = PLAYER.stem
+    work_dir = tmp_path / "work" / name
+    resources = export_player_resources(PLAYER, work_dir, parser_dll)
+    sff = build_character_sff(
+        resources, name, work_dir, tmp_path / "out", sprmake2_exe
+    ).sff_path
 
     explode_dir = tmp_path / "rt"
     pngs = _explode_sff(sff, sff2png_exe, explode_dir)

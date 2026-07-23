@@ -1,43 +1,73 @@
-"""Orchestrate one `.player` -> MUGEN `.sff`: parse, convert, build, place output."""
+"""Build a MUGEN `.sff` from a parsed `.player`'s sprites (SFF only).
+
+Parsing the `.player` and assembling the rest of the character folder belong to
+the orchestrator (`character_pipeline`); this module only turns exported sprites
+into an SFF and reports the sprite lookup the `.air` writer needs.
+"""
 
 import shutil
+from dataclasses import dataclass
 from pathlib import Path
 
 from fm2nd2mugen.bmp_to_png import convert_image_folder
-from fm2nd2mugen.parser_runner import export_player_resources
-from fm2nd2mugen.sprite_def_writer import build_sprite_entries, write_sprite_def
+from fm2nd2mugen.parser_runner import ExportedResources
+from fm2nd2mugen.sprite_def_writer import (
+    SpriteEntry,
+    build_sprite_entries,
+    build_sprite_map,
+    write_sprite_def,
+)
 from fm2nd2mugen.sprmake_runner import build_sff
 from fm2nd2mugen.wine_runner import RunWindowsTool, run_windows_tool
 
 
-def convert_player_to_sff(
-    player_file: Path,
-    work_root: Path,
+@dataclass(frozen=True)
+class SffBuildResult:
+    """The built SFF plus the sprite lookup the `.air` writer consumes.
+
+    `sprite_map` is `fm2nd_image_index -> (group, image)`; the AIR writer reads
+    group/image from it so sprite numbering is never hardcoded downstream.
+    """
+
+    sff_path: Path
+    sprite_map: dict[int, tuple[int, int]]
+
+
+def build_character_sff(
+    resources: ExportedResources,
+    name: str,
+    work_dir: Path,
     output_root: Path,
-    parser_dll: Path,
     sprmake2_exe: Path,
     run_tool: RunWindowsTool = run_windows_tool,
-) -> Path:
-    """Convert `player_file` into `<output_root>/<name>/<name>.sff`, returned.
+) -> SffBuildResult:
+    """Build `<output_root>/<name>/<name>.sff` from already-parsed `resources`.
 
-    All intermediates land under `work_root/<name>/`; the def + PNGs share one
-    directory so sprmake2's relative paths resolve cleanly under Wine.
+    Intermediates (PNGs + the sprmake2 def) land under `work_dir/png` so the def's
+    relative paths resolve cleanly under Wine.
+
+    Example:
+        >>> build_character_sff(resources, "ryu", work, out, Path("/mugen/sprmake2.exe"))
+        SffBuildResult(sff_path=.../ryu.sff, sprite_map={0: (0, 0), ...})
     """
-    name = player_file.stem
-    work_dir = work_root / name
-    resources = export_player_resources(player_file, work_dir, parser_dll)
-
     build_dir = work_dir / "png"
     pngs = convert_image_folder(resources.image_dir, build_dir)
-    built_sff = _build_sff_in(build_dir, name, pngs, sprmake2_exe, run_tool)
+    entries = build_sprite_entries(pngs)
+    built_sff = _build_sff_in(build_dir, name, entries, sprmake2_exe, run_tool)
+    sff_path = _place_output(built_sff, output_root / name / f"{name}.sff")
+    return SffBuildResult(sff_path, build_sprite_map(entries))
 
-    return _place_output(built_sff, output_root / name / f"{name}.sff")
 
-
-def _build_sff_in(build_dir, name, pngs, sprmake2_exe, run_tool) -> Path:
+def _build_sff_in(
+    build_dir: Path,
+    name: str,
+    entries: list[SpriteEntry],
+    sprmake2_exe: Path,
+    run_tool: RunWindowsTool,
+) -> Path:
     """Write the def next to the PNGs and build `<name>.sff` in `build_dir`."""
     def_file = build_dir / f"{name}-sff.def"
-    write_sprite_def(build_sprite_entries(pngs), def_file, f"{name}.sff")
+    write_sprite_def(entries, def_file, f"{name}.sff")
     return build_sff(def_file, build_dir / f"{name}.sff", sprmake2_exe, run_tool)
 
 

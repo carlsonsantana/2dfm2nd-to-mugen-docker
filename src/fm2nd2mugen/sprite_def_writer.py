@@ -36,6 +36,17 @@ def build_sprite_entries(png_files: list[Path]) -> list[SpriteEntry]:
     return [_entry_for(png_file) for png_file in png_files]
 
 
+def build_sprite_map(entries: list[SpriteEntry]) -> dict[int, tuple[int, int]]:
+    """Map each FM2nd flat image index to its SFF `(group, image)` placement.
+
+    The key is the FM2nd index (currently identical to the SFF image number, since
+    sprites map 1:1); the value carries the group so downstream writers (the `.air`)
+    read placement from here instead of assuming group 0. This is what lets the
+    group number change without touching the AIR code.
+    """
+    return {entry.image: (entry.group, entry.image) for entry in entries}
+
+
 def _entry_for(png_file: Path) -> SpriteEntry:
     """Build a group-0, axis-(0,0) entry from a numerically named PNG."""
     if not png_file.stem.isdigit():

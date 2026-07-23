@@ -9,8 +9,9 @@ import os
 import sys
 from pathlib import Path
 
+from fm2nd2mugen.parser_runner import export_player_resources
 from fm2nd2mugen.player_discovery import find_player_files
-from fm2nd2mugen.sff_pipeline import convert_player_to_sff
+from fm2nd2mugen.sff_pipeline import build_character_sff
 
 INPUT_DIR = Path(os.environ.get("FM2ND_INPUT_DIR", "/input"))
 OUTPUT_DIR = Path(os.environ.get("FM2ND_OUTPUT_DIR", "/output"))
@@ -33,11 +34,17 @@ def main() -> int:
 
 
 def _convert_one(player_file: Path) -> None:
-    """Convert a single `.player`, reporting the resulting SFF path."""
+    """Convert a single `.player`, reporting the resulting SFF path.
+
+    TODO: fold this parse+build into `character_pipeline.convert_player_to_character`
+    once the AIR stage lands; kept inline here so the entrypoint stays runnable.
+    """
     print(f"  {player_file.name} -> building SFF ...")
-    sff = convert_player_to_sff(
-        player_file, WORK_ROOT, OUTPUT_DIR, PARSER_DLL, SPRMAKE2_EXE
-    )
+    name = player_file.stem
+    work_dir = WORK_ROOT / name
+    resources = export_player_resources(player_file, work_dir, PARSER_DLL)
+    result = build_character_sff(resources, name, work_dir, OUTPUT_DIR, SPRMAKE2_EXE)
+    sff = result.sff_path
     print(f"    wrote {sff} ({sff.stat().st_size} bytes)")
 
 
