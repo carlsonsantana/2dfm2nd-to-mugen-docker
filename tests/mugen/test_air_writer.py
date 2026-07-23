@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from fm2nd2mugen.mugen.air_writer import build_actions, render_air, write_air
-from fm2nd2mugen.mugen.air_writer import _ticks
+from fm2nd2mugen.mugen.air_writer import Flip, _ticks
 from fm2nd2mugen.fm2nd.skill_reader import ImageFrame, SkillAnimation
 
 # 0000-numbered sprites mapped 1:1; enough for the simple cases.
@@ -22,17 +22,22 @@ def test_wait_rounds_independently_per_frame(wait: int, expected: int) -> None:
 
 
 @pytest.mark.parametrize(
-    "turn_x, turn_y, expected_suffix",
-    [(False, False, "0, 0, 0, 0, 1"), (True, False, "1"), (False, True, "1")],
+    "turn_x, turn_y, expected_flip",
+    [
+        (False, False, Flip.NONE),
+        (True, False, Flip.HORIZONTAL),
+        (False, True, Flip.VERTICAL),
+        (True, True, Flip.BOTH),
+    ],
 )
 def test_flip_param_appended_only_when_set(
-    turn_x: bool, turn_y: bool, expected_suffix: str
+    turn_x: bool, turn_y: bool, expected_flip: Flip
 ) -> None:
     skill = SkillAnimation(0, "S", [ImageFrame(0, 0, 0, 1, turn_x, turn_y)])
 
     (frame,) = build_actions([skill], IDENTITY_MAP)[0].frames
 
-    assert frame.flip == ("H" if turn_x else "") + ("V" if turn_y else "")
+    assert frame.flip is expected_flip
 
 
 def test_render_matches_golden_with_non_identity_map() -> None:

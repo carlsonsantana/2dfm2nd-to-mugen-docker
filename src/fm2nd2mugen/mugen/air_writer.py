@@ -7,9 +7,20 @@ group number is never hardcoded here.
 """
 
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 
 from fm2nd2mugen.fm2nd.skill_reader import ImageFrame, SkillAnimation
+
+
+class Flip(Enum):
+    """MUGEN animation-element flip param; value is the `.air` token (None = omit)."""
+
+    NONE = None
+    HORIZONTAL = "H"
+    VERTICAL = "V"
+    BOTH = "HV"
+
 
 # FM2nd waits in 10 ms units; MUGEN runs at 60 ticks/s (~16.667 ms/tick).
 _FM2ND_WAIT_MS = 10.0
@@ -32,7 +43,7 @@ class AirFrame:
     xoffset: int
     yoffset: int
     time: int
-    flip: str  # "", "H", "V", or "HV"
+    flip: Flip
 
 
 @dataclass(frozen=True)
@@ -112,9 +123,15 @@ def _ticks(wait: int) -> int:
     return round(wait * _FM2ND_WAIT_MS / _MUGEN_TICK_MS)
 
 
-def _flip(turn_x: bool, turn_y: bool) -> str:
-    """FM2nd turnX/turnY -> MUGEN flip param (`H`, `V`, `HV`, or empty)."""
-    return ("H" if turn_x else "") + ("V" if turn_y else "")
+def _flip(turn_x: bool, turn_y: bool) -> Flip:
+    """FM2nd turnX/turnY -> MUGEN flip param (`H`, `V`, `HV`, or none)."""
+    if turn_x and turn_y:
+        return Flip.BOTH
+    if turn_x:
+        return Flip.HORIZONTAL
+    if turn_y:
+        return Flip.VERTICAL
+    return Flip.NONE
 
 
 def _render_action(action: AirAction) -> str:
@@ -137,7 +154,7 @@ def _render_frame(frame: AirFrame) -> str:
     line = (
         f"{frame.group}, {frame.image}, {frame.xoffset}, {frame.yoffset}, {frame.time}"
     )
-    return f"{line}, {frame.flip}" if frame.flip else line
+    return f"{line}, {frame.flip.value}" if frame.flip is not Flip.NONE else line
 
 
 def _comment_safe(name: str) -> str:
