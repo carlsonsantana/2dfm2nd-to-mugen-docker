@@ -1,11 +1,14 @@
-"""Tests for the indexed BMP -> 8-bit PNG conversion (fm2nd2mugen.bmp_to_png)."""
+"""Tests for the indexed BMP -> 8-bit PNG conversion (fm2nd2mugen.common.bmp_to_png)."""
 
 from pathlib import Path
 
 import pytest
 from PIL import Image
 
-from fm2nd2mugen.bmp_to_png import convert_image_folder, convert_indexed_bmp_to_png
+from fm2nd2mugen.common.bmp_to_png import (
+    convert_image_folder,
+    convert_indexed_bmp_to_png,
+)
 
 
 def test_conversion_preserves_size_indices_and_palette(

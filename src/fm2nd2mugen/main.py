@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 from fm2nd2mugen.character_pipeline import convert_player_to_character
-from fm2nd2mugen.player_discovery import find_player_files
+from fm2nd2mugen.fm2nd.player_discovery import find_player_files
 
 INPUT_DIR = Path(os.environ.get("FM2ND_INPUT_DIR", "/input"))
 OUTPUT_DIR = Path(os.environ.get("FM2ND_OUTPUT_DIR", "/output"))

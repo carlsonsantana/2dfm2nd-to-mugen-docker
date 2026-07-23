@@ -11,11 +11,11 @@ Milestone: SFF + AIR. The `.def`/`.cns`/`.cmd`/`.snd`/`.act` stages extend
 from dataclasses import dataclass
 from pathlib import Path
 
-from fm2nd2mugen.air_writer import build_actions, write_air
-from fm2nd2mugen.parser_runner import export_player_resources
-from fm2nd2mugen.sff_pipeline import build_character_sff
-from fm2nd2mugen.skill_reader import load_skills
-from fm2nd2mugen.wine_runner import RunWindowsTool, run_windows_tool
+from fm2nd2mugen.common.wine_runner import RunWindowsTool, run_windows_tool
+from fm2nd2mugen.fm2nd.parser_runner import export_player_resources
+from fm2nd2mugen.fm2nd.skill_reader import load_skills
+from fm2nd2mugen.mugen.air_writer import build_actions, write_air
+from fm2nd2mugen.mugen.sff_pipeline import build_character_sff
 
 
 @dataclass(frozen=True)

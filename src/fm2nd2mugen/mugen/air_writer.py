@@ -9,7 +9,7 @@ group number is never hardcoded here.
 from dataclasses import dataclass
 from pathlib import Path
 
-from fm2nd2mugen.skill_reader import ImageFrame, SkillAnimation
+from fm2nd2mugen.fm2nd.skill_reader import ImageFrame, SkillAnimation
 
 # FM2nd waits in 10 ms units; MUGEN runs at 60 ticks/s (~16.667 ms/tick).
 _FM2ND_WAIT_MS = 10.0

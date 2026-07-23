@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from fm2nd2mugen.wine_runner import RunWindowsTool, run_windows_tool
+from fm2nd2mugen.common.wine_runner import RunWindowsTool, run_windows_tool
 
 
 class SprmakeError(RuntimeError):

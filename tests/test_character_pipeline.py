@@ -8,8 +8,8 @@ import json
 from pathlib import Path
 
 from fm2nd2mugen import character_pipeline
-from fm2nd2mugen.parser_runner import ExportedResources
-from fm2nd2mugen.wine_runner import WineToolResult
+from fm2nd2mugen.fm2nd.parser_runner import ExportedResources
+from fm2nd2mugen.common.wine_runner import WineToolResult
 
 _CHARACTER_JSON = {
     "skills": [

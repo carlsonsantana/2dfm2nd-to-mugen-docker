@@ -1,10 +1,10 @@
-"""Tests for the sprmake2 def writer (fm2nd2mugen.sprite_def_writer)."""
+"""Tests for the sprmake2 def writer (fm2nd2mugen.mugen.sprite_def_writer)."""
 
 from pathlib import Path
 
 import pytest
 
-from fm2nd2mugen.sprite_def_writer import (
+from fm2nd2mugen.mugen.sprite_def_writer import (
     SpriteEntry,
     build_sprite_entries,
     render_sprite_def,

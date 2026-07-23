@@ -14,7 +14,7 @@ import pytest
 
 from _roundtrip_compare import assert_png_matches_reference, parse_sprite_def
 from fm2nd2mugen.character_pipeline import convert_player_to_character
-from fm2nd2mugen.wine_runner import run_windows_tool
+from fm2nd2mugen.common.wine_runner import run_windows_tool
 
 FIXTURES = Path(__file__).parent / "fixtures" / "roundtrip"
 PLAYER = FIXTURES / "character.player"

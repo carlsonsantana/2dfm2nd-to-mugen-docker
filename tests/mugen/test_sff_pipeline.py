@@ -7,9 +7,9 @@ here `resources` is constructed directly.
 
 from pathlib import Path
 
-from fm2nd2mugen import sff_pipeline
-from fm2nd2mugen.parser_runner import ExportedResources
-from fm2nd2mugen.wine_runner import WineToolResult
+from fm2nd2mugen.mugen import sff_pipeline
+from fm2nd2mugen.fm2nd.parser_runner import ExportedResources
+from fm2nd2mugen.common.wine_runner import WineToolResult
 
 
 def test_build_character_sff_wires_stages(tmp_path, make_indexed_bmp) -> None:

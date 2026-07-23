@@ -1,12 +1,12 @@
-"""Tests for the `.air` writer (fm2nd2mugen.air_writer)."""
+"""Tests for the `.air` writer (fm2nd2mugen.mugen.air_writer)."""
 
 from pathlib import Path
 
 import pytest
 
-from fm2nd2mugen.air_writer import build_actions, render_air, write_air
-from fm2nd2mugen.air_writer import _ticks
-from fm2nd2mugen.skill_reader import ImageFrame, SkillAnimation
+from fm2nd2mugen.mugen.air_writer import build_actions, render_air, write_air
+from fm2nd2mugen.mugen.air_writer import _ticks
+from fm2nd2mugen.fm2nd.skill_reader import ImageFrame, SkillAnimation
 
 # 0000-numbered sprites mapped 1:1; enough for the simple cases.
 IDENTITY_MAP = {i: (0, i) for i in range(10)}

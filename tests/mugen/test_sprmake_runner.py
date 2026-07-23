@@ -1,11 +1,11 @@
-"""Tests for build_sff (fm2nd2mugen.sprmake_runner) using a fake Wine runner."""
+"""Tests for build_sff (fm2nd2mugen.mugen.sprmake_runner) using a fake Wine runner."""
 
 from pathlib import Path
 
 import pytest
 
-from fm2nd2mugen.sprmake_runner import SprmakeError, build_sff
-from fm2nd2mugen.wine_runner import WineToolResult
+from fm2nd2mugen.mugen.sprmake_runner import SprmakeError, build_sff
+from fm2nd2mugen.common.wine_runner import WineToolResult
 
 
 def _fake_tool_writing(content: bytes):

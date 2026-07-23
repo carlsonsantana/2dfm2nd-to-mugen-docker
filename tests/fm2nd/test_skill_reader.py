@@ -1,11 +1,11 @@
-"""Tests for the character-JSON reader (fm2nd2mugen.skill_reader)."""
+"""Tests for the character-JSON reader (fm2nd2mugen.fm2nd.skill_reader)."""
 
 import json
 from pathlib import Path
 
 import pytest
 
-from fm2nd2mugen.skill_reader import ImageFrame, SkillAnimation, load_skills
+from fm2nd2mugen.fm2nd.skill_reader import ImageFrame, SkillAnimation, load_skills
 
 
 def _write_json(tmp_path: Path, document: object) -> Path:

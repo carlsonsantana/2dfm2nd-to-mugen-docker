@@ -9,16 +9,16 @@ import shutil
 from dataclasses import dataclass
 from pathlib import Path
 
-from fm2nd2mugen.bmp_to_png import convert_image_folder
-from fm2nd2mugen.parser_runner import ExportedResources
-from fm2nd2mugen.sprite_def_writer import (
+from fm2nd2mugen.common.bmp_to_png import convert_image_folder
+from fm2nd2mugen.common.wine_runner import RunWindowsTool, run_windows_tool
+from fm2nd2mugen.fm2nd.parser_runner import ExportedResources
+from fm2nd2mugen.mugen.sprite_def_writer import (
     SpriteEntry,
     build_sprite_entries,
     build_sprite_map,
     write_sprite_def,
 )
-from fm2nd2mugen.sprmake_runner import build_sff
-from fm2nd2mugen.wine_runner import RunWindowsTool, run_windows_tool
+from fm2nd2mugen.mugen.sprmake_runner import build_sff
 
 
 @dataclass(frozen=True)
